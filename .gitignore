@@ -1,0 +1,4 @@
+# Project exclude paths
+/gea-core/target/
+/gea-idtech/target/
+/target/

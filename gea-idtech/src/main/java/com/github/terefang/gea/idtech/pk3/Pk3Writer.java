@@ -1,4 +1,4 @@
-package com.github.terefang.gea.q2.pk3;
+package com.github.terefang.gea.idtech.pk3;
 
 import com.github.terefang.gea.GeaWriter;
 

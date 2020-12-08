@@ -1,4 +1,4 @@
-import com.github.terefang.gea.q2.pk3.*;
+import com.github.terefang.gea.idtech.pk3.*;
 
 import java.io.File;
 import java.io.IOException;

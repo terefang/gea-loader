@@ -13,6 +13,7 @@
     <modules>
         <module>gea-core</module>
         <module>gea-idtech</module>
+        <module>gea-godot</module>
     </modules>
 
     <properties>

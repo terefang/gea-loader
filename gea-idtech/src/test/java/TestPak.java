@@ -1,6 +1,6 @@
-import com.github.terefang.gea.q2.pak.PakLoader;
-import com.github.terefang.gea.q2.pak.PakUtil;
-import com.github.terefang.gea.q2.pak.PakWriter;
+import com.github.terefang.gea.idtech.pak.PakLoader;
+import com.github.terefang.gea.idtech.pak.PakUtil;
+import com.github.terefang.gea.idtech.pak.PakWriter;
 
 import java.io.File;
 import java.io.IOException;

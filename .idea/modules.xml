@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gea-core/gea-core.iml" filepath="$PROJECT_DIR$/gea-core/gea-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gea-godot/gea-godot.iml" filepath="$PROJECT_DIR$/gea-godot/gea-godot.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gea-idtech/gea-idtech.iml" filepath="$PROJECT_DIR$/gea-idtech/gea-idtech.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gea-loader-parent.iml" filepath="$PROJECT_DIR$/gea-loader-parent.iml" />
+    </modules>
+  </component>
+</project>

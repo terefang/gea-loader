@@ -1,4 +1,4 @@
-package com.github.terefang.gea.q2.wad;
+package com.github.terefang.gea.idtech.wad;
 
 import com.github.terefang.gea.GeaFile;
 
@@ -8,7 +8,7 @@ public class WadFile extends GeaFile<WadFileEntry>
 {
     public InputStream getFileStream(WadFileEntry _entry) throws IOException
     {
-        byte[] _buffer = new byte[_entry.getSize()];
+        byte[] _buffer = new byte[(int)_entry.getSize()];
 
         RandomAccessFile _raf = new RandomAccessFile(new File(this.getFilepath()), "r");
         _raf.seek(_entry.getOffset());

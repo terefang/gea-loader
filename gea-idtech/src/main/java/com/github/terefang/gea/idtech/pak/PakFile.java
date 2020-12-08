@@ -1,4 +1,4 @@
-package com.github.terefang.gea.q2.pak;
+package com.github.terefang.gea.idtech.pak;
 
 import com.github.terefang.gea.GeaFile;
 import java.io.*;
@@ -19,7 +19,7 @@ public class PakFile extends GeaFile<PakFileEntry>
     {
         if(_entry.getSize()==0) return null;
 
-        byte[] _buffer = new byte[_entry.getSize()];
+        byte[] _buffer = new byte[(int)_entry.getSize()];
 
         RandomAccessFile _raf = new RandomAccessFile(new File(this.getFilepath()), "r");
         _raf.seek(_entry.getOffset());

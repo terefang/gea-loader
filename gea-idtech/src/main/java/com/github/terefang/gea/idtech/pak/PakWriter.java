@@ -1,19 +1,19 @@
-package com.github.terefang.gea.q2.wad;
+package com.github.terefang.gea.idtech.pak;
 
 import com.github.terefang.gea.GeaWriter;
-
 import org.apache.commons.compress.utils.IOUtils;
 
 import java.io.*;
 import java.util.List;
 import java.util.Map;
 
-public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
+public class PakWriter implements GeaWriter<PakFile, PakFileEntry>
 {
-    public static WadWriter instance() { return new WadWriter(); }
+    public static PakWriter instance() { return new PakWriter(); }
+
     public static void packFromDirectory(File _base, int _cf, File _dest) throws IOException
     {
-        List<File> _files = WadUtil.listFile(_base);
+        List<File> _files = PakUtil.listFile(_base);
         packFromDirectory(_base, _files, _cf, _dest);
     }
 
@@ -21,7 +21,7 @@ public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
     {
         int _noffset = _base.getAbsolutePath().length();
 
-        WadWriter _pw = WadWriter.create(_cf, _dest);
+        PakWriter _pw = PakWriter.create(_cf, _dest);
 
         for (File _file : _files)
         {
@@ -31,24 +31,24 @@ public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
         _pw.close();
     }
 
-    public static void packFrom(WadFile _pak) throws IOException
+    public static void packFrom(PakFile _pak) throws IOException
     {
-        WadWriter _pw = create(0, _pak.getFilepath());
+        PakWriter _pw = create(_pak.getCompression(), _pak.getFilepath());
         _pw.write(_pak);
         _pw.close();
     }
 
-    public static WadWriter create(int _cf, String _dest) throws IOException
+    public static PakWriter create(int _cf, String _dest) throws IOException
     {
         return create(_cf, new File(_dest));
     }
 
-    public static WadWriter create(int _cf, File _dest) throws IOException {
+    public static PakWriter create(int _cf, File _dest) throws IOException {
         _dest.delete();
-        WadWriter _pw = new WadWriter();
+        PakWriter _pw = new PakWriter();
         _pw.setCompression(_cf);
         _pw.setDestinationFile(new RandomAccessFile(_dest, "rw"));
-        _pw.setOffset(WadUtil._ENTRY_OFFSET);
+        _pw.setOffset(PakUtil._ENTRY_OFFSET);
         _pw.setFileCount(0);
         _pw.setFileEntriesBuffer(new ByteArrayOutputStream());
         return _pw;
@@ -58,22 +58,31 @@ public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
     {
         this.getDestinationFile().seek(this.getOffset());
 
+        if(this.getCompression()!=PakUtil.COMRESS_NONE && _content.length>0)
+        {
+            ByteArrayOutputStream _baos = new ByteArrayOutputStream();
+            OutputStream _os = PakUtil.wrap(_baos, this.getCompression());
+            _os.write(_content);
+            _os.flush();
+            _os.close();
+            _content = _baos.toByteArray();
+        }
         this.getDestinationFile().write(_content);
 
-        this.writeEntry(_name, (int) this.getOffset(), _content.length);
+        this.writeEntryTable(_name, (int) this.getOffset(), _content.length);
 
         this.addOffset(_content.length);
         this.addOffset((32-(this.getOffset()%16)));
         this.setFileCount(this.getFileCount()+1);
     }
 
-    public void write(WadFile _content) throws IOException
+    public void write(PakFile _content) throws IOException
     {
-        for(Map.Entry<String, WadFileEntry> _entry : _content.getFileEntries().entrySet())
+        for(Map.Entry<String, PakFileEntry> _entry : _content.getFileEntries().entrySet())
             this.writeEntry(_entry.getValue());
     }
 
-    public void writeEntry(WadFileEntry _entry) throws IOException
+    public void writeEntry(PakFileEntry _entry) throws IOException
     {
         this.writeEntry(_entry.getName(), _entry.getLocalFile());
     }
@@ -88,11 +97,11 @@ public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
         this.writeEntry(_name, IOUtils.toByteArray(_content));
     }
 
-    public void writeEntry(String _name, int _offset, int _size) throws IOException
+    public void writeEntryTable(String _name, int _offset, int _size) throws IOException
     {
-        this.getFileEntriesBuffer().write(WadUtil.intToByteLittleEndian((int) _offset));
-        this.getFileEntriesBuffer().write(WadUtil.intToByteLittleEndian((int) _size));
         this.getFileEntriesBuffer().write(nameEntryArray(_name));
+        this.getFileEntriesBuffer().write(PakUtil.intToByteLittleEndian((int) _offset));
+        this.getFileEntriesBuffer().write(PakUtil.intToByteLittleEndian((int) _size));
     }
 
     public void close() throws IOException
@@ -103,17 +112,26 @@ public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
         this.getDestinationFile().seek(0L);
         switch (this.getCompression())
         {
-            case 'I':
-                this.getDestinationFile().write(WadUtil._HEADER_TYPE_IWAD);
+            case PakUtil.COMRESS_LZ4:
+                this.getDestinationFile().write(PakUtil._HEADER_PACK_LZ4);
                 break;
-            case 'P':
+            case PakUtil.COMRESS_XZ:
+                this.getDestinationFile().write(PakUtil._HEADER_PACK_XZ);
+                break;
+            case PakUtil.COMRESS_BZLIB:
+                this.getDestinationFile().write(PakUtil._HEADER_PACK_BZLIB);
+                break;
+            case PakUtil.COMRESS_FLATE:
+                this.getDestinationFile().write(PakUtil._HEADER_PACK_ZLIB);
+                break;
+            case PakUtil.COMRESS_NONE:
             default:
-                this.getDestinationFile().write(WadUtil._HEADER_TYPE_PWAD);
+                this.getDestinationFile().write(PakUtil._HEADER_PACK);
                 break;
         }
-        this.getDestinationFile().write(WadUtil.intToByteLittleEndian(this.getFileCount()));
-        this.getDestinationFile().write(WadUtil.intToByteLittleEndian((int) this.getOffset()));
-        this.getDestinationFile().write(WadUtil.intToByteLittleEndian((int) (System.currentTimeMillis()/1000)));
+        this.getDestinationFile().write(PakUtil.intToByteLittleEndian((int) this.getOffset()));
+        this.getDestinationFile().write(PakUtil.intToByteLittleEndian(this.getFileCount() * PakUtil._HEADER_ENTRY));
+        this.getDestinationFile().write(PakUtil.intToByteLittleEndian((int) (System.currentTimeMillis()/1000)));
         this.getDestinationFile().close();
     }
 
@@ -179,14 +197,11 @@ public class WadWriter implements GeaWriter<WadFile, WadFileEntry>
 
     static byte[] nameEntryArray(String _fileName)
     {
-        _fileName = _fileName.toUpperCase();
+        if(_fileName.startsWith("/")) _fileName = _fileName.substring(1);
 
-        if(_fileName.indexOf('/')>=0) _fileName = _fileName.substring(_fileName.lastIndexOf('/')+1);
-        if(_fileName.indexOf('.')>=0) _fileName = _fileName.substring(0, _fileName.indexOf('.'));
+        byte[] _entry = new byte[PakUtil._NAME_SIZE];
 
-        byte[] _entry = new byte[WadUtil._NAME_SIZE];
-
-        if(_fileName.length()>WadUtil._NAME_SIZE) _fileName = _fileName.substring(0, WadUtil._NAME_SIZE);
+        if(_fileName.length()>55) _fileName = _fileName.substring(_fileName.length()-55);
 
         for (int _i = 0; _i < _fileName.length(); _i++) {
             _entry[_i] = (byte) _fileName.charAt(_i);

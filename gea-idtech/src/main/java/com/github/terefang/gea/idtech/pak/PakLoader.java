@@ -1,4 +1,4 @@
-package com.github.terefang.gea.q2.pak;
+package com.github.terefang.gea.idtech.pak;
 
 import com.github.terefang.gea.GeaLoader;
 import org.apache.commons.compress.utils.IOUtils;

@@ -1,4 +1,4 @@
-package com.github.terefang.gea.q2.wad;
+package com.github.terefang.gea.idtech.wad;
 
 import com.github.terefang.gea.GeaUtil;
 

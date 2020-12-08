@@ -5,8 +5,8 @@ import java.io.File;
 public class GeaFileEntry {
     String name;
     long offset;
-    int size;
-    int realSize;
+    long size;
+    long realSize;
     int compression;
 
     public String getName() {
@@ -25,19 +25,19 @@ public class GeaFileEntry {
         this.offset = offset;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         this.size = size;
     }
 
-    public int getRealSize() {
+    public long getRealSize() {
         return realSize;
     }
 
-    public void setRealSize(int realSize) {
+    public void setRealSize(long realSize) {
         this.realSize = realSize;
     }
 

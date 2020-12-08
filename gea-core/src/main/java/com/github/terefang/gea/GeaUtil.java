@@ -27,6 +27,26 @@ public class GeaUtil {
     public static final int COMRESS_LZ4 = 4;
     public static final int COMRESS_ZSTD = 5;
 
+    public static int intSwap(int value) {
+        return ((value & 0xff) << 24)
+                | (((value >>> 8) & 0xff) << 16)
+                | (((value >>> 16) & 0xff) << 8)
+                | ((value >>> 24) & 0xff)
+                ;
+    }
+
+    public static long longSwap(long value) {
+        return ((value & 0xff) << 56)
+                | (((value >>> 8) & 0xff) << 48)
+                | (((value >>> 16) & 0xff) << 40)
+                | (((value >>> 24) & 0xff) << 32)
+                | (((value >>> 32) & 0xff) << 24)
+                | (((value >>> 40) & 0xff) << 16)
+                | (((value >>> 48) & 0xff) << 8)
+                | ((value >>> 56) & 0xff)
+                ;
+    }
+
     public static byte[] intToByteLittleEndian(int value) {
         return new byte[]{
                 (byte) (value),
@@ -68,10 +88,25 @@ public class GeaUtil {
                 (byte) value};
     }
 
+    public static long readLongLittleEndian(byte[] array) {
+        return readLongLittleEndian(array, 0);
+    }
+
+    public static long readLongLittleEndian(byte[] array, int offset) {
+        return ((array[7 + offset] & 0xff) << 56)
+                | ((array[6 + offset] & 0xff) << 48)
+                | ((array[5 + offset] & 0xff) << 40)
+                | ((array[4 + offset] & 0xff) << 32)
+                | ((array[3 + offset] & 0xff) << 24)
+                | ((array[2 + offset] & 0xff) << 16)
+                | ((array[1 + offset] & 0xff) << 8)
+                | (array[0 + offset] & 0xff);
+    }
+
     public static int readIntLittleEndian(byte[] array, int offset) {
-        return array[3 + offset] << 24
-                | (array[2 + offset] & 0xff) << 16
-                | (array[1 + offset] & 0xff) << 8
+        return (array[3 + offset] << 24)
+                | ((array[2 + offset] & 0xff) << 16)
+                | ((array[1 + offset] & 0xff) << 8)
                 | (array[0 + offset] & 0xff);
     }
 

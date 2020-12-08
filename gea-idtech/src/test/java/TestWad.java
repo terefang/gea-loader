@@ -1,4 +1,4 @@
-import com.github.terefang.gea.q2.wad.*;
+import com.github.terefang.gea.idtech.wad.*;
 
 import java.io.File;
 import java.io.IOException;
